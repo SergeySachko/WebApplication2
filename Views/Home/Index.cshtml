@@ -1,0 +1,80 @@
+﻿
+<html ng-app="myApp">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular-sanitize.js"></script>
+    <meta charset=utf-8 />
+    <title></title>
+</head>
+<body ng-controller="MyController" data-ng-init="init()">  
+    <div class="container">
+        <div class="col=md-6 col-md-offset-4">
+            <table class="table_blur">
+                <tr>
+                    <th>Less 10Mb</th>
+                    <th>10Mb-50Mb</th>
+                    <th>More 100Mb</th>
+                </tr>
+                <tr>
+                    <td>{{countS}}</td>
+                    <td>{{countX}}</td>
+                    <td>{{countXL}}</td>
+                </tr>
+            </table>
+        </div>
+      
+        <p><b>Current path:</b>{{currentPathDir}}</p>
+        <ul>
+           <li ng-show="isChild"><a ng-click="back(currentDir)">...</a></li>
+           <li ng-repeat="dir in directory"><a ng-click="nextDir(dir)">{{dir}}</a></li>
+        </ul>
+        <ul>
+            <li ng-repeat="file in files">{{file}}</li>
+        </ul>
+      
+    </div>
+    <script>
+    var app = angular.module('myApp', []);
+    app.controller("MyController", function ($scope, $http) {
+        $scope.init = function () {
+            $http.get('http://localhost:19967/api/values').success(function (data) {
+                $scope.directory = data.Dir;
+                $scope.files = data.file;
+                $scope.isChild = false;
+                $scope.countS = data.countS;
+                $scope.countX = data.countX;
+                $scope.countXL = data.countXL;
+                $scope.currentPathDir = data.currentPathDir;
+            });
+        };
+        $scope.nextDir = function (pathname) {
+            $http({ method: 'Get', url: 'http://localhost:19967/api/values/'+pathname, params: { privious: false } }).success(function (data) {
+                $scope.directory = data.Dir;
+                $scope.files = data.file;
+                $scope.currentDir = data.currentDir;
+                $scope.isChild = data.isChild;
+                $scope.countS = data.countS;
+                $scope.countX = data.countX;
+                $scope.countXL = data.countXL;
+                $scope.currentPathDir = data.currentPathDir;
+            });
+        }
+        $scope.back = function (pathname) {
+            $http({ method: 'Get', url: 'http://localhost:19967/api/values/' + pathname, params: { privious: true } }).success(function (data) {
+                $scope.directory = data.Dir;
+                $scope.files = data.file;
+                $scope.currentDir = data.currentDir;
+                $scope.isChild = data.isChild;
+                $scope.countS = data.countS;
+                $scope.countX = data.countX;
+                $scope.countXL = data.countXL;
+                $scope.currentPathDir = data.currentPathDir;
+            });
+        }
+       
+        
+    });
+
+    </script>
+</body>
+</html>
